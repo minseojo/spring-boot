@@ -1,11 +1,11 @@
 package study.user.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.user.User;
 import study.user.UserService;
+import study.user.annotation.Authenticated;
 
 import java.util.Map;
 import java.util.Optional;
@@ -27,31 +27,24 @@ public class UserController {
         }
     }
 
+    @Authenticated
     @GetMapping("/mypage")
     public ResponseEntity<?> myPage(User user) {
-        if (user == null) {
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
-
         Optional<User> foundUser = userService.findUserByEmail(user.getEmail());
         return ResponseEntity.ok("User Page successfully: " + foundUser.get());
     }
 
+    @Authenticated
     @PutMapping("/change-email")
     public ResponseEntity<?> changeEmail(User user) {
-        if (user == null) {
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
-        // ...
+        // ... 이메일 변경 로직
         return ResponseEntity.ok("change email successfully");
     }
 
+    @Authenticated
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(User user) {
-        if (user == null) {
-            return ResponseEntity.status(401).body("User not authenticated");
-        }
-        // ...
+        // ... 비밀번호 변경 로직
         return ResponseEntity.ok("change password successfully");
     }
 }
