@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -25,5 +27,13 @@ public class UserService {
             throw new RuntimeException("Invalid credentials");
         }
         return user;
+    }
+
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User loadUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
     }
 }

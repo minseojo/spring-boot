@@ -13,21 +13,11 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
 
     private final JwtUtil jwtUtil;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> user) {
-        try {
-            userService.registerUser(user.get("email"), user.get("password"));
-            return ResponseEntity.ok("User registered successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> user) {
@@ -35,8 +25,6 @@ public class AuthController {
             User authenticatedUser = userService.authenticateUser(user.get("email"), user.get("password"));
             String token = jwtUtil.generateToken(authenticatedUser);
             return ResponseEntity.ok(new HashMap<String, String>() {{
-                put("email", authenticatedUser.getEmail());
-                put("password", authenticatedUser.getPassword());
                 put("token", token);
             }});
         } catch (Exception e) {
