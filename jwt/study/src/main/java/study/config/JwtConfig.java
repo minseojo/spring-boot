@@ -1,4 +1,4 @@
-package study;
+package study.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -9,7 +9,7 @@ import study.filter.JwtRequestFilter;
 
 @Configuration
 @RequiredArgsConstructor
-public class Config {
+public class JwtConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
 

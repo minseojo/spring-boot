@@ -1,4 +1,4 @@
-package study.user;
+package study.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import study.jwt.JwtUtil;
+import study.user.User;
+import study.user.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
