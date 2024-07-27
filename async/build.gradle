@@ -39,9 +39,6 @@ dependencies {
 	// H2 Database for testing
 	runtimeOnly 'com.h2database:h2'
 	// Spring Boot Test
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-com.async.test'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-}
