@@ -1,4 +1,4 @@
-package study.user.controller;
+package study.user.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

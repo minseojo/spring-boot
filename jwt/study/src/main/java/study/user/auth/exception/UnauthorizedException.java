@@ -1,4 +1,4 @@
-package study.user.exception;
+package study.user.auth.exception;
 
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String message) {

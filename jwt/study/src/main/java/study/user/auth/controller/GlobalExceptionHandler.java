@@ -1,9 +1,9 @@
-package study.user.controller;
+package study.user.auth.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import study.user.exception.UnauthorizedException;
+import study.user.auth.exception.UnauthorizedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

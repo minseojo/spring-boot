@@ -1,4 +1,4 @@
-package study.user.controller;
+package study.user.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;

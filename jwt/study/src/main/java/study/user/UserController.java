@@ -1,11 +1,9 @@
-package study.user.controller;
+package study.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import study.user.User;
-import study.user.UserService;
-import study.user.annotation.Authenticated;
+import study.user.auth.annotation.Authenticated;
 
 import java.util.Map;
 import java.util.Optional;
