@@ -1,4 +1,4 @@
-package study.user.auth;
+package study.user.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,16 @@ public class AuthController {
     private final UserService userService;
 
     private final JwtUtil jwtUtil;
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> user) {
+        try {
+            userService.registerUser(user.get("email"), user.get("password"));
+            return ResponseEntity.ok("User registered successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> user) {

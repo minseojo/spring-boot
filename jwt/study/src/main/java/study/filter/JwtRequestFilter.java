@@ -27,27 +27,50 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String email = extractEmailFromRequest(request);
+        String jwt = extractJwtFromRequest(request);
+
+        if (email != null && request.getAttribute("user") == null) {
+            authenticateUser(request, email, jwt);
+        } else {
+            throw  new RuntimeException("bad request");
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private String extractEmailFromRequest(HttpServletRequest request) {
         final String authorizationHeader = request.getHeader("Authorization");
 
         logger.info("Authorization Header: {}", authorizationHeader);
 
-        String email = null;
-        String jwt = null;
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7); // "Bearaer " 이후 jwt 토큰
-            email = jwtUtil.extractEmail(jwt);
+            String jwt = authorizationHeader.substring(7); // "Bearer " 이후 jwt 토큰
+            String email = jwtUtil.extractEmail(jwt);
             logger.info("JWT: {}", jwt);
             logger.info("Email: {}", email);
+            return email;
+        } else {
+            throw new RuntimeException("Authorization header is invalid");
         }
+    }
 
-        if (email != null && request.getAttribute("user") == null) {
-            User user = userService.loadUserByEmail(email);
-            if (jwtUtil.validateToken(jwt, user)) {
-                request.setAttribute("user", user);
-                logger.info("User authenticated: {}", user.getEmail());
-            }
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // "Bearer " 이후 jwt 토큰
+        } else {
+            throw new RuntimeException("Authorization header is invalid");
         }
-        filterChain.doFilter(request, response);
+    }
+
+    private void authenticateUser(HttpServletRequest request, String email, String jwt) {
+        User user = userService.loadUserByEmail(email);
+        if (jwtUtil.validateToken(jwt, user)) {
+            request.setAttribute("user", user);
+            logger.info("User authenticated: {}", user.getEmail());
+        } else {
+            throw new RuntimeException("User authenticated");
+        }
     }
 }

@@ -15,16 +15,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> user) {
-        try {
-            userService.registerUser(user.get("email"), user.get("password"));
-            return ResponseEntity.ok("User registered successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @Authenticated
     @GetMapping("/mypage")
     public ResponseEntity<?> myPage(User user) {
