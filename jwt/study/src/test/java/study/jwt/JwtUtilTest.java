@@ -1,6 +1,7 @@
 package study.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import study.user.User;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
 
@@ -90,5 +92,52 @@ public class JwtUtilTest {
         assertThrows(ExpiredJwtException.class, () -> {
             jwtUtil.extractEmail(expiredToken);
         });
+    }
+
+
+    @DisplayName("JWT 헤더에서 alg 값을 추출")
+    @Test
+    public void testExtractAlg() throws IOException {
+        String token = jwtUtil.generateToken(testUser);
+        String[] tokenParts = token.split("\\.");
+        String alg = jwtUtil.extractAlg(tokenParts[0]);
+        assertEquals("HS256", alg);
+    }
+
+    @DisplayName("토큰을 이용해서 페이로드 변경, 서버에서 시그니처 검증을 안하면 해킹 성공")
+    @Test
+    public void test() throws IOException {
+        String token = jwtUtil.generateToken(testUser);
+        String[] tokenParts = token.split("\\.");
+        String userEmail = jwtUtil.extractEmail(token);
+
+        // 토큰 해킹
+        String hackedHeader = tokenParts[0];
+        String hackedPayload = new String(Base64.getUrlEncoder().encode(
+                "{\"sub\":\"hacked@example.com\",\"name\":\"Hacked User\",\"admin\":false}".getBytes()));
+        String hackedJwtSignatureAlgorithm = jwtUtil.extractAlg(hackedHeader);
+
+        // 시크릿 키 해킹
+        byte[] hackedSecretKey = Base64.getDecoder().decode(SECRET_KEY);
+
+        // 헤더와 페이로드를 사용하여 새로운 서명을 생성합니다.
+        String hackedSignature = jwtUtil.generateSignature(hackedHeader, hackedPayload, hackedJwtSignatureAlgorithm, hackedSecretKey);
+
+        // 새로운 서명을 사용하여 해킹된 토큰을 생성합니다.
+        String hackedToken = hackedHeader + "." + hackedPayload + "." + hackedSignature;
+
+        // 원래 토큰과 해킹된 토큰이 동일하지 않음을 확인합니다.
+        assertNotEquals(token, hackedToken);
+
+        // 서명 검증을 하지 않는 서버로부터 검증 성공
+        boolean isValid = jwtUtil.validateTokenWithoutSignature(hackedToken);
+        assertTrue(isValid);
+
+        // email 은 jwt 토큰의 subject
+        String hackedEmail = jwtUtil.extractEmailWithoutSignature(hackedToken);
+        // 해킹 성공, 페이로드 subject 변경
+        assertNotEquals(userEmail, hackedEmail);
+        assertEquals(userEmail, "liging12@naver.com");
+        assertEquals(hackedEmail, "hacked@example.com");
     }
 }

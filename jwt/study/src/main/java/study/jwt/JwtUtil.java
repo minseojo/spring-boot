@@ -1,11 +1,14 @@
 package study.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 import study.user.User;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 토큰 생성(generateToken): 사용자의 이메일을 주제로 하여 10시간 동안 유효한 JWT를 생성합니다.
@@ -57,5 +60,50 @@ public class JwtUtil {
                 .getBody()
                 .getExpiration() // JWT에서 만료 시간을 추출하여 현재 시간과 비교합니다.
                 .before(new Date()); // 만료 시간이 현재 시간보다 이전이면 검증 성공
+    }
+
+
+
+    // JWT 해킹
+    // JWT 토큰의 헤더에서 alg 값을 추출합니다. (해커 클라이언트)
+    public String extractAlg(String token) throws IOException {
+        String[] tokenParts = token.split("\\.");
+        String header = new String(Base64.getUrlDecoder().decode(tokenParts[0]));
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> headerMap = mapper.readValue(header, Map.class);
+        return (String) headerMap.get("alg");
+    }
+
+    // 서명을 재생성하는 메서드 (해커 클라이언트)
+    public String generateSignature(String header, String payload, String algorithm, byte[] secretKey) {
+        String unsignedToken = header + "." + payload;
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.forName(algorithm);
+        return Jwts.builder()
+                .setHeaderParam("alg", signatureAlgorithm.getValue())
+                .setPayload(payload)
+                .signWith(signatureAlgorithm, secretKey)
+                .compact()
+                .split("\\.")[2];
+    }
+
+    // 서명을 검증하지 않고 이메일을 추출합니다.
+    public String extractEmailWithoutSignature(String token) {
+        String[] tokenParts = token.split("\\.");
+        String unsignedToken = tokenParts[0] + "." + tokenParts[1] + ".";
+        Claims claims = Jwts.parser()
+                .parseClaimsJwt(unsignedToken)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    // 서명을 검증하지 않고 토큰을 검증합니다. (서버)
+    // 해커 클라이언트가 서버에게 요청시 서버는 서명을 검증하지 않는 시뮬레이션 (실제로는 절대 이래서는 안됨.)
+    public boolean validateTokenWithoutSignature(String token) {
+        try {
+            String email = extractEmailWithoutSignature(token);
+            return email != null;
+        } catch (JwtException e) {
+            return false;
+        }
     }
 }
