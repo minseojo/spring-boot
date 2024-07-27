@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "mySecretKey";
+    public static final String SECRET_KEY = "mySecretKey";
     private static final byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY);
 
     // 로그인한 사용자의 토큰을 생성한다.
@@ -50,7 +50,7 @@ public class JwtUtil {
     }
 
     // 입력받은 JWT가 만료되었는지 확인합니다.
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return Jwts.parser()
                 .setSigningKey(keyBytes)
                 .parseClaimsJws(token)
@@ -59,14 +59,3 @@ public class JwtUtil {
                 .before(new Date()); // 만료 시간이 현재 시간보다 이전이면 검증 성공
     }
 }
-
-//JWT의 구조
-//JWT는 세 부분으로 구성됩니다:
-//
-//헤더(Header): 토큰의 타입과 서명 알고리즘 정보를 포함합니다.
-//페이로드(Payload): 클레임(claims)이라고 불리는 사용자에 대한 정보가 포함됩니다.
-//서명(Signature): 헤더와 페이로드를 비밀 키를 사용하여 암호화한 것입니다.
-
-//setSigningKey 메서드의 역할
-//JWT 생성 시: JWT를 생성할 때 서명을 만드는데 사용됩니다. signWith 메서드와 함께 사용되어 특정 알고리즘(예: HS256)과 비밀 키를 기반으로 서명을 생성합니다.
-//JWT 검증 시: JWT를 검증할 때 사용됩니다. JWT의 서명을 확인하여 토큰이 변경되지 않았음을 검증합니다. 이는 비밀 키가 동일할 때만 검증이 성공하도록 합니다.
