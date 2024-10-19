@@ -11,17 +11,8 @@ import java.util.Locale;
 @Configuration
 public class MessageSourceConfig implements WebMvcConfigurer {
 
-    List<Locale> supportedLocales = List.of(Locale.KOREA, Locale.KOREAN);
-
     @Bean
     public MessageSource messageSource() {
-        XmlMessageSource xmlMessageSource = new XmlMessageSource();
-
-        xmlMessageSource.setDefaultLocale(Locale.ENGLISH);
-        for (Locale supportedLocale : supportedLocales) {
-            xmlMessageSource.setMessages(supportedLocale);
-        }
-
-        return xmlMessageSource;
+        return new PropertiesMessageSource().messageSource();
     }
 }
