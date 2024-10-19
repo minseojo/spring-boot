@@ -13,6 +13,6 @@ public class MessageSourceConfig implements WebMvcConfigurer {
 
     @Bean
     public MessageSource messageSource() {
-        return new PropertiesMessageSource().messageSource();
+        return new YmlMessageSource();
     }
 }
